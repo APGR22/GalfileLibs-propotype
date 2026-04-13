@@ -1,0 +1,15 @@
+{
+    "/": {
+        "folders": {
+            "folder1": {
+                "folders": {},
+                "files": []
+            },
+            "folder2": {
+                "folders": {},
+                "files": []
+            }
+        },
+        "files": []
+    }
+}
