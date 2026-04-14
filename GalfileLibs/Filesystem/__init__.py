@@ -1,1 +1,1 @@
-from . import Path, File, Folder
+from . import Virtual, Physical, Path
