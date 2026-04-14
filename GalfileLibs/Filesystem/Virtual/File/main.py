@@ -49,7 +49,10 @@ class File:
 
     def get_name(self):
         return self.__name
-    
+
+    def get_size(self):
+        return len(self.__data)
+
     def get_checksum(self):
         hash = hashlib.sha256(self.__data)
         return hash.hexdigest()
