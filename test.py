@@ -9,28 +9,12 @@ else:
 
 file_path = dir_path.joinpath("tes.txt")
 
-file = GalfileLibs.Filesystem.Virtual.File.File.new("nama file")
-file.write(b"isi file dengan berbagai konten")
+filesystem = GalfileLibs.Filesystem.Virtual.PathSystem.VirtualPathSystem.new()
 
-folder = GalfileLibs.Filesystem.Virtual.Folder.Folder.new("nama folder")
-folder.append_file(file)
+filesystem.mkdirs("/run/media/azhar")
 
-file_ptr = folder.get_file(file.get_name())
-print(file_ptr is file)
+filesystem.cd("/run/media/azhar")
+print(filesystem.pwd())
 
-print(folder.get_tree_size())
-
-file2 = GalfileLibs.Filesystem.Virtual.File.File.new("nama file 2")
-file2.write(file.read())
-
-folder2 = GalfileLibs.Filesystem.Virtual.Folder.Folder.new("nama folder 2")
-folder2.append_file(file2)
-
-folder.append_folder(folder2)
-
-print(folder.get_tree_size())
-
-folder_1 = folder.duplicate()
-folder2.append_folder(folder_1)
-
-print(folder.get_tree_size())
+filesystem.rmdirs("/run/media")
+print(filesystem.pwd())

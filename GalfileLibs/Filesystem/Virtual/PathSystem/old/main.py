@@ -68,7 +68,7 @@ class VirtPath:
         return path #type: ignore
 
     def _is_absolute(self, p: Path):
-        path_s = str(p)
+        path_s = p.as_posix()
 
         if path_s.startswith(self._root_path_s):
             return True

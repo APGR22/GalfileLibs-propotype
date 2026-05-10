@@ -1,1 +1,1 @@
-from . import Virtual, Physical, Path
+from . import Virtual, Physical

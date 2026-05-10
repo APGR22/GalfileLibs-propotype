@@ -12,38 +12,52 @@ class Folder:
     __files: list[File]
     __folders: list[Folder]
 
+    __parent: Folder | None
+
     def __init__(
         self,
         name: str,
         files: list[File],
-        folders: list[Folder]
+        folders: list[Folder],
+        parent: Folder | None
     ):
         self.__name = name
         self.__files = files
         self.__folders = folders
+        self.__parent = parent
 
     @classmethod
     def new(cls, name: str):
         empty_files: list[File] = []
         empty_folders: list[Folder] = []
+        unknown_parent = None
 
         return cls(
             name,
             empty_files,
-            empty_folders
+            empty_folders,
+            unknown_parent
         )
 
-    def get_index_of_file(self, file: File):
+    def get_index_of_file(self, file: File | str):
         for index, __file in enumerate(self.__files):
-            if __file.is_same_name(file):
-                return index
+            if isinstance(file, str):
+                if __file.get_name() == file:
+                    return index
+            else:
+                if __file.is_same_name(file):
+                    return index
 
         return -1
 
-    def get_index_of_folder(self, folder: Folder):
+    def get_index_of_folder(self, folder: Folder | str):
         for index, __folder in enumerate(self.__folders):
-            if __folder.is_same_name(folder):
-                return index
+            if isinstance(folder, str):
+                if __folder.get_name() == folder:
+                    return index
+            else:
+                if __folder.is_same_name(folder):
+                    return index
 
         return -1
 
@@ -53,8 +67,11 @@ class Folder:
     def has_folder(self, folder: Folder):
         return self.get_index_of_folder(folder) != -1
 
-    def append_file(self, file: File, ignore_existing_error: bool = False):
-        if self.has_file(file) and not ignore_existing_error:
+    def has_parent(self):
+        return self.__parent is not None
+
+    def append_file(self, file: File, ignore_file_exists_error: bool = False):
+        if self.has_file(file) and not ignore_file_exists_error:
             raise GalfileLibs.System.Error.EnumException(
                 ErrorType.THE_FILE_IS_ALREADY_EXISTED
             )
@@ -75,6 +92,7 @@ class Folder:
             )
 
         self.__folders.append(folder)
+        folder.__parent = self # menjadi orang tua asuhnya
 
     def remove_file(self, file: File):
         index = self.get_index_of_file(file)
@@ -90,11 +108,16 @@ class Folder:
 
         self.__folders.pop(index)
 
+    def clear(self):
+        self.__files.clear()
+        self.__folders.clear()
+
     def duplicate(self):
         return Folder(
             self.__name,
             copy.deepcopy(self.__files),
-            copy.deepcopy(self.__folders)
+            copy.deepcopy(self.__folders),
+            self.__parent
         )
 
     def get_name(self):
@@ -121,10 +144,17 @@ class Folder:
             if __file.get_name() == filename:
                 return __file
 
+        return None
+
     def get_folder(self, foldername: str):
         for __folder in self.__folders:
             if __folder.__name == foldername:
                 return __folder
+
+        return None
+
+    def get_parent(self):
+        return self.__parent
 
     def is_same_name(self, other: Folder):
         return self.__name == other.__name
