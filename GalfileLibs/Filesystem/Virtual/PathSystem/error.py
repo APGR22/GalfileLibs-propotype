@@ -13,3 +13,5 @@ class ErrorType(Enum):
     THE_FILE_IS_NOT_EXISTS = auto()
 
     THE_SRC_AND_DST_IS_SAME = auto()
+
+    THE_JSON_OBJECT_IS_NOT_FILESYSTEM_TYPE = auto()

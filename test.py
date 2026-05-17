@@ -36,4 +36,11 @@ root_json = root_ptr.dump_json()
 
 root_back = GalfileLibs.Filesystem.Virtual.Folder.Folder.from_load_json(root_json)
 
-print(root_back.get_folder_in_name("run").get_folder_in_name("media").get_parent().get_name()) #type: ignore
+# print(root_back.get_folder_in_name("run").get_folder_in_name("media").get_parent().get_name()) #type: ignore
+
+filesystem.cd("run/media/azhar")
+filesystem_json = filesystem.dump_json()
+
+filesystem_back = GalfileLibs.Filesystem.Virtual.PathSystem.VirtualPathSystem.from_load_json(filesystem_json)
+
+print(filesystem_back.cd(".").get_name())

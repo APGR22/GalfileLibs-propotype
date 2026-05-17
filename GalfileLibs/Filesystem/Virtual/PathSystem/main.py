@@ -6,6 +6,7 @@ import GalfileLibs
 import os
 import colorama
 from .conf import *
+import json
 
 __all__ = [
     "VirtualPathSystem"
@@ -38,6 +39,35 @@ class VirtualPathSystem:
             curdir_ptr,
             curdir_path
         )
+
+    @classmethod
+    def from_load_json_obj(cls, json_obj: dict[
+        str,
+        str | dict
+    ]):
+        if json_obj["type"] != "filesystem":
+            raise GalfileLibs.System.Error.EnumException(
+                ErrorType.THE_JSON_OBJECT_IS_NOT_FILESYSTEM_TYPE
+            )
+
+        root = Folder.from_load_json_obj(json_obj["content"]) #type: ignore
+        curdir_path = Path(json_obj["curdir_path"]) #type: ignore
+
+        clss = cls(
+            root,
+            root,
+            curdir_path
+        )
+
+        clss.cd(curdir_path)
+
+        return clss
+
+    @classmethod
+    def from_load_json(cls, json_data: str):
+        json_obj = json.loads(json_data)
+
+        return cls.from_load_json_obj(json_obj)
 
     def __normalize_to_path(self, path: str | Path) -> Path:
         if isinstance(path, str):
@@ -141,6 +171,14 @@ class VirtualPathSystem:
 
             if isinstance(item_ptr, Folder):
                 self.__tree(item_ptr, indent, buffer_next)
+
+    def _get_json_obj(self):
+        json_obj: dict[str, str | dict] = {}
+        json_obj["type"] = "filesystem"
+        json_obj["content"] = self.__root._get_json_obj()
+        json_obj["curdir_path"] = self.__curdir_path.as_posix()
+
+        return json_obj
 
     def cd(self, to_path: str | Path):
         to_path = self.__normalize_to_path(to_path)
@@ -396,3 +434,8 @@ class VirtualPathSystem:
         print(Conf.colorFolder + dir_ptr.get_name() + colorama.Fore.RESET)
 
         self.__tree(dir_ptr)
+
+    def dump_json(self):
+        json_obj = self._get_json_obj()
+
+        return json.dumps(json_obj, indent=4)
