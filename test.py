@@ -2,6 +2,8 @@ import GalfileLibs
 from pathlib import Path
 import platform
 
+from GalfileLibs.Filesystem.Virtual.File.main import File
+
 if platform.system() == "Windows":
     dir_path = Path("E:/Programs/Projects/File Manager/Cloud/Galfile/Library/test")
 else:
@@ -11,10 +13,22 @@ file_path = dir_path.joinpath("tes.txt")
 
 filesystem = GalfileLibs.Filesystem.Virtual.PathSystem.VirtualPathSystem.new()
 
-filesystem.mkdirs("/run/media/azhar")
+filesystem.mkdirs("run/media/azhar/Windows")
+filesystem.mkdirs("run/media/azhar/Linux")
 
-filesystem.cd("/run/media/azhar")
-print(filesystem.pwd())
+filesystem.cd("run/media/azhar")
 
-filesystem.rmdirs("/run/media")
-print(filesystem.pwd())
+file_ptr = filesystem.mkfile("Windows/azhar_file")
+
+file_ptr.write(b"Halo")
+
+file_cp_ptr = filesystem.cpfile("Windows/azhar_file", "Linux")
+
+file_ptr.write(b"H")
+file_cp_ptr.write(b"konni")
+
+filesystem.mvdirs("Windows", "../../")
+
+filesystem.tree()
+
+# tinggal panah bawahnya untuk tree()
