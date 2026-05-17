@@ -13,3 +13,5 @@ class ErrorType(Enum):
     THE_FOLDERNAME_IS_ALREADY_EXISTED = auto()
 
     THE_NAME_IS_ALREADY_EXISTED = auto()
+
+    THE_JSON_OBJECT_IS_NOT_FOLDER_TYPE = auto()

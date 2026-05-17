@@ -2,6 +2,7 @@ import GalfileLibs
 from GalfileLibs.Filesystem.Virtual.File import File
 from .error import *
 import copy
+import json
 
 __all__ = [
     "Folder"
@@ -38,6 +39,83 @@ class Folder:
             empty_folders,
             unknown_parent
         )
+
+    @classmethod
+    def from_load_json_obj(cls, json_obj: dict[
+            str,
+            str | list
+        ]):
+        if json_obj["type"] != "folder":
+            raise GalfileLibs.System.Error.EnumException(
+                ErrorType.THE_JSON_OBJECT_IS_NOT_FOLDER_TYPE
+            )
+
+        name: str = json_obj["name"] #type: ignore
+        files: list[dict[str, str]] = json_obj["files"] #type: ignore
+        folders: list[
+            dict[
+                str,
+                str | list
+            ]
+        ] = json_obj["folders"] #type: ignore
+
+        files_ptr: list[File] = []
+        folders_ptr: list[Folder] = []
+        empty_parent = None
+
+        clss = cls(
+            name,
+            files_ptr,
+            folders_ptr,
+            empty_parent
+        )
+
+        for file in files:
+            file_ptr = File.from_load_json_obj(file)
+
+            files_ptr.append(file_ptr)
+
+        for folder in folders:
+            folder_ptr = Folder.from_load_json_obj(folder)
+            folder_ptr.__parent = clss
+
+            folders_ptr.append(folder_ptr)
+
+        return clss
+
+    @classmethod
+    def from_load_json(cls, json_data: str):
+        json_obj: dict[
+            str,
+            str | list[
+                dict[str, str]
+            ]
+        ] = json.loads(json_data)
+
+        return cls.from_load_json_obj(json_obj)
+
+    def _get_json_obj(self) -> dict[str, str]:
+        json_obj = {}
+        json_obj["type"] = "folder"
+        json_obj["name"] = self.__name
+
+        files: list[
+            dict[str, str]
+        ] = []
+        for __file in self.__files:
+            files.append(__file._get_json_obj())
+
+        json_obj["files"] = files
+
+        folders: list[
+            dict[str, str]
+        ] = []
+        for __folder in self.__folders:
+            folders.append(__folder._get_json_obj())
+
+        json_obj["folders"] = folders
+
+        return json_obj
 
     def get_index_of_file(self, file: File):
         for index, __file in enumerate(self.__files):
@@ -200,3 +278,6 @@ class Folder:
 
     def is_same_name(self, other: Folder):
         return self.__name == other.__name
+    
+    def dump_json(self):
+        return json.dumps(self._get_json_obj(), indent=4)
